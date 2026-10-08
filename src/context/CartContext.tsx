@@ -58,7 +58,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [couponCode, setCouponCode] = useState<string>('');
   const [discountPercent, setDiscountPercent] = useState<number>(0);
   const [toast, setToast] = useState<string | null>(null);
-  const [showPreloader, setShowPreloader] = useState<boolean>(true);
+  const [showPreloader, setShowPreloader] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('nopreload') === 'true') return false;
+    }
+    return true;
+  });
   const [preloaderVideoUrl, setPreloaderVideoUrl] = useState<string>('/videos/preloader.mp4');
 
   useEffect(() => {

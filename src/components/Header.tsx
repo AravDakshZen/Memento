@@ -11,6 +11,15 @@ import {
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS } from '../data/products';
 
+const SEARCH_KEYWORDS = [
+  'cakes',
+  'party items',
+  'luxury gift hampers',
+  'keepsake boxes',
+  'artisanal cupcakes',
+  'sweet favors'
+];
+
 export const Header: React.FC = () => {
   const {
     cartCount,
@@ -19,12 +28,58 @@ export const Header: React.FC = () => {
     setActiveProduct
   } = useCart();
 
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('opensearch') === 'true';
+    }
+    return false;
+  });
+  const [keywordIndex, setKeywordIndex] = useState(0);
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   const [isPagesDropdownOpen, setIsPagesDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  // Vertical rolling ticker for search keywords
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setKeywordIndex((prev) => (prev + 1) % SEARCH_KEYWORDS.length);
+    }, 2400);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Collapse search when clicking outside or pressing Escape (if search input is empty)
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchWrapRef.current &&
+        !searchWrapRef.current.contains(event.target as Node) &&
+        !searchQuery
+      ) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (searchQuery) {
+          setSearchQuery('');
+        } else {
+          setIsSearchOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [searchQuery]);
 
   const searchResults = searchQuery.trim()
     ? ALL_PRODUCTS.filter(
@@ -34,12 +89,6 @@ export const Header: React.FC = () => {
           p.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()))
       ).slice(0, 6)
     : [];
-
-  useEffect(() => {
-    if (isSearchExpanded && searchInputRef.current) {
-      searchInputRef.current.focus();
-    }
-  }, [isSearchExpanded]);
 
   const scrollToSection = (sectionId: string) => {
     if (activePage !== 'home') {
@@ -262,59 +311,106 @@ export const Header: React.FC = () => {
 
           {/* Action Icons */}
           <div className="navbar-actions">
-            {/* Expandable Search */}
-            <div className={`navbar-search-container ${isSearchExpanded ? 'expanded' : ''}`}>
-              <button
-                type="button"
-                className="action-icon-btn search-trigger-btn"
-                onClick={() => {
-                  setIsSearchExpanded(!isSearchExpanded);
-                  if (isSearchExpanded) {
-                    setSearchQuery('');
-                  }
-                }}
-                aria-label="Search"
-              >
-                {isSearchExpanded ? <X size={16} /> : <Search size={16} />}
-              </button>
-
-              {isSearchExpanded && (
-                <div className="navbar-search-expanded">
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="Search hampers, cakes, keepsakes..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="navbar-search-input"
-                  />
-                  {searchQuery && (
-                    <div className="navbar-search-results">
-                      {searchResults.length === 0 ? (
-                        <div className="no-search-results">
-                          <p>No results for "{searchQuery}"</p>
-                        </div>
-                      ) : (
-                        searchResults.map((p) => (
-                          <div
-                            key={p.id}
-                            className="search-result-row search-result-text-only"
-                            onClick={() => {
-                              setActiveProduct(p);
-                              navigateTo('/product/' + p.slug);
-                              setIsSearchExpanded(false);
-                              setSearchQuery('');
-                            }}
+            {/* Integrated Search Bar inside Navbar */}
+            <div className="navbar-search-inline-wrap" ref={searchWrapRef}>
+              {!isSearchOpen ? (
+                <button
+                  type="button"
+                  className="action-icon-btn search-toggle-btn"
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    setTimeout(() => searchInputRef.current?.focus(), 50);
+                  }}
+                  title="Search boutique"
+                  aria-label="Search boutique"
+                >
+                  <Search size={18} />
+                </button>
+              ) : (
+                <div className="navbar-search-pill expanded">
+                  <Search size={15} className="search-pill-icon" />
+                  <div className="search-input-field-wrap">
+                    <input
+                      ref={searchInputRef}
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="navbar-search-inline-input"
+                      autoComplete="off"
+                      aria-label="Search products"
+                    />
+                    {!searchQuery && (
+                      <div
+                        className="animated-search-placeholder"
+                        onClick={() => searchInputRef.current?.focus()}
+                        aria-hidden="true"
+                      >
+                        <span className="placeholder-static">Search for&nbsp;</span>
+                        <span className="placeholder-ticker-window">
+                          <span
+                            className="placeholder-ticker-track"
+                            style={{ transform: `translateY(-${keywordIndex * 22}px)` }}
                           >
-                            <div className="search-result-info">
-                              <span className="search-result-cat">{p.category}</span>
-                              <h4 className="search-result-title">{p.name}</h4>
-                            </div>
-                            <span className="search-result-price">${p.price.toFixed(2)}</span>
-                          </div>
-                        ))
-                      )}
+                            {SEARCH_KEYWORDS.map((word, idx) => (
+                              <span key={idx} className="placeholder-keyword-item">
+                                {word}
+                              </span>
+                            ))}
+                          </span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    className="search-clear-btn"
+                    onClick={() => {
+                      if (searchQuery) {
+                        setSearchQuery('');
+                        searchInputRef.current?.focus();
+                      } else {
+                        setIsSearchOpen(false);
+                      }
+                    }}
+                    title={searchQuery ? 'Clear search' : 'Close search'}
+                    aria-label={searchQuery ? 'Clear search' : 'Close search'}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+
+              {isSearchOpen && searchQuery && (
+                <div className="navbar-search-results-dropdown">
+                  {searchResults.length === 0 ? (
+                    <div className="no-search-results">
+                      <p>No products found for "{searchQuery}"</p>
                     </div>
+                  ) : (
+                    <>
+                      <div className="search-results-header">
+                        <span>Matching Products ({searchResults.length})</span>
+                      </div>
+                      {searchResults.map((p) => (
+                        <div
+                          key={p.id}
+                          className="search-result-row"
+                          onClick={() => {
+                            setActiveProduct(p);
+                            navigateTo('/product/' + p.slug);
+                            setSearchQuery('');
+                            setIsSearchOpen(false);
+                          }}
+                        >
+                          <img src={p.image} alt={p.name} className="search-result-thumb" />
+                          <div className="search-result-info">
+                            <span className="search-result-cat">{p.category}</span>
+                            <h4 className="search-result-title">{p.name}</h4>
+                          </div>
+                          <span className="search-result-price">${p.price.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </>
                   )}
                 </div>
               )}

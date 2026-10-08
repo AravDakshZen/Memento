@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Trash2, ShoppingBag, Sparkles, ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useCart } from '../context/CartContext';
@@ -22,6 +23,23 @@ export const CartPage: React.FC = () => {
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [checkoutComplete, setCheckoutComplete] = useState(false);
+
+  useEffect(() => {
+    if (window.location.pathname.includes('checkout') && cart.length > 0) {
+      setIsCheckoutModalOpen(true);
+    }
+  }, [cart.length]);
+
+  useEffect(() => {
+    if (isCheckoutModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isCheckoutModalOpen]);
 
   const shippingCost = cartSubtotal >= 300 || cartSubtotal === 0 ? 0 : shippingMethod === 'standard' ? 5.00 : 15.00;
   const grandTotal = Math.max(0, cartSubtotal - discount + shippingCost);
@@ -342,8 +360,8 @@ export const CartPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Interactive Checkout Modal */}
-      {isCheckoutModalOpen && (
+      {/* Interactive Checkout Modal rendered into document.body */}
+      {isCheckoutModalOpen && createPortal(
         <div className="modal-backdrop" onClick={() => !checkoutComplete && setIsCheckoutModalOpen(false)}>
           <div className="checkout-modal-card" onClick={(e) => e.stopPropagation()}>
             {checkoutComplete ? (
@@ -440,7 +458,8 @@ export const CartPage: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

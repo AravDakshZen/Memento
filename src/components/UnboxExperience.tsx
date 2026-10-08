@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Gift, RotateCcw, ShoppingBag } from 'lucide-react';
+import { Sparkles, Gift, RotateCcw, ShoppingBag, Feather } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS } from '../data/products';
@@ -9,9 +9,10 @@ export const UnboxExperience: React.FC = () => {
   const { addToCart, showToast, navigateTo, setActiveProduct } = useCart();
   const [isUnboxed, setIsUnboxed] = useState(false);
   const [isShuffling, setIsShuffling] = useState(false);
-  const [activeSealColor, setActiveSealColor] = useState('#d13e63');
-  const [stampText, setStampText] = useState('M');
-  const [isStamping, setIsStamping] = useState(false);
+  const [activeInkColor, setActiveInkColor] = useState('#8266b7');
+  const [noteRecipient, setNoteRecipient] = useState('Dearest Sarah');
+  const [noteMessage, setNoteMessage] = useState('Wishing you sweet celebration & everlasting delight.');
+  const [isNoteSaved, setIsNoteSaved] = useState(false);
 
   // Helper to pick 3 random items
   const getRandomTrio = (): Product[] => {
@@ -59,17 +60,16 @@ export const UnboxExperience: React.FC = () => {
     showToast('✨ Splendid! Added all 3 surprise atelier gifts to your shopping bag.');
   };
 
-  const handleStamp = () => {
-    setIsStamping(true);
-    setTimeout(() => {
-      setIsStamping(false);
-      confetti({
-        particleCount: 30,
-        spread: 40,
-        origin: { y: 0.75 },
-        colors: ['#ffd166', '#d13e63']
-      });
-    }, 600);
+  const handleSaveNote = () => {
+    setIsNoteSaved(true);
+    confetti({
+      particleCount: 40,
+      spread: 50,
+      origin: { y: 0.75 },
+      colors: ['#ffd166', '#f5899e', '#8266b7']
+    });
+    showToast('💌 Handwritten calligraphy card personalized & included with your box!');
+    setTimeout(() => setIsNoteSaved(false), 3000);
   };
 
   const totalBundlePrice = mysteryItems.reduce((acc, curr) => acc + curr.price, 0);
@@ -98,40 +98,40 @@ export const UnboxExperience: React.FC = () => {
                 <div className="silk-ribbon-cross horizontal" />
                 <div className="silk-ribbon-cross vertical" />
                 <div className="satin-bow-knot">
-                  <div className="bow-loop loop-left" />
-                  <div className="bow-center-pearl" />
-                  <div className="bow-loop loop-right" />
-                  <div className="bow-tail tail-left" />
-                  <div className="bow-tail tail-right" />
+                  <div className="bow-loop left" />
+                  <div className="bow-loop right" />
+                  <div className="bow-center" />
                 </div>
               </div>
 
-              {/* Box Base Interior */}
-              <div className="box-base-interior">
-                <div className="rose-tissue-layer">
-                  {/* Revealed Keepsake Items */}
-                  <div className={`revealed-items-grid ${isShuffling ? 'shuffling-pulse' : ''}`}>
-                    {mysteryItems.map((item, idx) => (
-                      <div
-                        key={item.id + '-' + idx}
-                        className={`revealed-item item-${idx + 1}`}
-                        onClick={() => {
-                          setActiveProduct(item);
-                          navigateTo('/product/' + item.slug);
-                        }}
-                        title={`Click to view ${item.name}`}
-                      >
-                        <div className="item-pedestal-glow" />
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="cutout-floating-img"
-                        />
-                        <span className="revealed-item-cat">{item.category}</span>
-                        <span className="revealed-item-title">{item.name}</span>
-                        <span className="revealed-item-price">${item.price.toFixed(2)}</span>
-                      </div>
-                    ))}
+              {/* Box Base */}
+              <div className="box-base">
+                <div className="box-inner-velvet">
+                  {/* Revealed Random 3 Items */}
+                  <div className="mystery-revealed-trio">
+                    <span className="mystery-trio-tag">✦ Your Bespoke 3-Gift Curation ✦</span>
+                    <div className="revealed-trio-grid">
+                      {mysteryItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="revealed-item"
+                          onClick={() => {
+                            setActiveProduct(item);
+                            navigateTo('/product/' + item.slug);
+                          }}
+                          title={`Click to view ${item.name}`}
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="cutout-floating-img"
+                          />
+                          <span className="revealed-item-cat">{item.category}</span>
+                          <span className="revealed-item-title">{item.name}</span>
+                          <span className="revealed-item-price">${item.price.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -179,29 +179,29 @@ export const UnboxExperience: React.FC = () => {
             </div>
           </div>
 
-          {/* Wax Stamping Station Micro-Interaction */}
-          <div className="wax-stamp-station-card">
-            <div className="stamp-station-header">
-              <span className="stamp-sub">Signature Detailing</span>
-              <h3>Bespoke Wax Seal Press</h3>
-              <p>Customize your personal wax seal monogram to be hand-stamped onto your gift envelope.</p>
+          {/* Bespoke Calligraphy Note Concierge Card */}
+          <div className="calligraphy-concierge-card">
+            <div className="calligraphy-card-header">
+              <span className="calligraphy-eyebrow">BESPOKE KEEPSAKE NOTE</span>
+              <h3>Handwritten Calligraphy Card</h3>
+              <p>Each box arrives with a complimentary archival cotton deckled-edge note penned with dip-pen calligraphy.</p>
             </div>
 
-            <div className="wax-color-selection">
-              <span className="selection-label">Select Atelier Wax Blend:</span>
+            <div className="calligraphy-color-selection">
+              <span className="selection-label">Select Archival Ink Tone:</span>
               <div className="swatches-flex">
                 {[
-                  { name: 'Royal Crimson', hex: '#d13e63' },
-                  { name: 'Antique Gold', hex: '#ffd166' },
                   { name: 'Imperial Violet', hex: '#8266b7' },
-                  { name: 'Dusty Rosé', hex: '#fca5b7' }
+                  { name: 'Royal Crimson', hex: '#d13e63' },
+                  { name: 'Antique Bronze', hex: '#a67c52' },
+                  { name: 'Dusty Rosé', hex: '#f5899e' }
                 ].map((s) => (
                   <button
                     key={s.hex}
                     type="button"
-                    className={`wax-swatch-circle ${activeSealColor === s.hex ? 'active' : ''}`}
+                    className={`ink-swatch-circle ${activeInkColor === s.hex ? 'active' : ''}`}
                     style={{ backgroundColor: s.hex }}
-                    onClick={() => setActiveSealColor(s.hex)}
+                    onClick={() => setActiveInkColor(s.hex)}
                     title={s.name}
                     aria-label={s.name}
                   />
@@ -209,31 +209,60 @@ export const UnboxExperience: React.FC = () => {
               </div>
             </div>
 
-            <div className="stamp-monogram-input-wrap">
-              <label htmlFor="stamp-monogram-input">Monogram Letter:</label>
-              <input
-                id="stamp-monogram-input"
-                type="text"
-                maxLength={2}
-                value={stampText}
-                onChange={(e) => setStampText(e.target.value.toUpperCase())}
-                placeholder="M"
-              />
+            <div className="calligraphy-inputs-wrap">
+              <div className="calligraphy-input-group">
+                <label>Recipient Salutation:</label>
+                <input
+                  type="text"
+                  maxLength={30}
+                  value={noteRecipient}
+                  onChange={(e) => setNoteRecipient(e.target.value)}
+                  placeholder="Dearest One"
+                />
+              </div>
+
+              <div className="calligraphy-input-group">
+                <label>Personal Inscription:</label>
+                <input
+                  type="text"
+                  maxLength={65}
+                  value={noteMessage}
+                  onChange={(e) => setNoteMessage(e.target.value)}
+                  placeholder="With all our love on your special celebration..."
+                />
+              </div>
             </div>
 
-            {/* Interactive Press Pad */}
-            <div className="wax-stamp-press-stage" onClick={handleStamp} data-cursor="PRESS">
-              <div
-                className={`wax-seal-wax-pool ${isStamping ? 'stamping-active' : ''}`}
-                style={{ backgroundColor: activeSealColor }}
-              >
-                <div className="seal-outer-rim" />
-                <span className="seal-embossed-letter">{stampText || 'M'}</span>
+            {/* Interactive Deckled-Edge Stationery Card Preview */}
+            <div className="deckled-stationery-card">
+              <div className="deckled-card-inner">
+                <div className="stationery-gold-crest">✦ MEMENTO ✦</div>
+                <h4
+                  className="calligraphy-salutation"
+                  style={{ color: activeInkColor }}
+                >
+                  {noteRecipient || 'Dearest One'},
+                </h4>
+                <p
+                  className="calligraphy-body"
+                  style={{ color: activeInkColor }}
+                >
+                  "{noteMessage || 'Wishing you radiant joy and treasured memories.'}"
+                </p>
+                <div className="stationery-footer-seal">
+                  <span className="stationery-footer-text">— Handcrafted with love</span>
+                </div>
               </div>
-              <p className="press-hint-text">
-                {isStamping ? 'Embossing hot wax seal...' : '✦ Click to press & test seal impression'}
-              </p>
             </div>
+
+            <button
+              type="button"
+              className="btn-save-calligraphy"
+              onClick={handleSaveNote}
+            >
+              <Feather size={15} />
+              {isNoteSaved ? '✓ Note Attached to Box!' : 'Personalize & Attach Gift Note'}
+            </button>
           </div>
         </div>
       </div>

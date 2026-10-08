@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Heart,
   ShoppingCart,
@@ -6,8 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Package,
-  Sparkles,
-  Star
+  Sparkles
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import gsap from 'gsap';
@@ -23,6 +23,7 @@ import {
 } from '../data/products';
 import type { Product } from '../types';
 import { UnboxExperience } from '../components/UnboxExperience';
+import { RatingStars } from '../components/RatingStars';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,6 +41,17 @@ export const HomePage: React.FC = () => {
   const [activeTestimonialIdx, setActiveTestimonialIdx] = useState(0);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (quickViewProduct) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [quickViewProduct]);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const hampersRef = useRef<HTMLDivElement>(null);
@@ -414,12 +426,6 @@ export const HomePage: React.FC = () => {
 
         <div className="site-container hero-inner-container">
           <div className="hero-content-box">
-            {/* Atelier Badge */}
-            <div className="hero-badge-pill hero-stagger-text">
-              <Sparkles size={13} className="sparkle-spin" />
-              <span>THE HAUTE GIFTING ATELIER • EST. 2026</span>
-            </div>
-
             <div className="hero-title-wrap hero-stagger-text">
               <h1 className="hero-main-heading">
                 The Art of Meaningful Gifting
@@ -507,14 +513,14 @@ export const HomePage: React.FC = () => {
           {/* Transparent Cutout Floating Gift Box Stage */}
           <div className="story-center-col">
             <div className="diamond-gift-box-wrap cutout-product-stage" data-tilt data-cursor="VIEW">
-              <div className="cutout-pedestal-aura" />
               <img
                 src="/images/craft_gift_box.jpg"
                 alt="Handcrafted Celestial gift box"
                 className="cutout-floating-img"
               />
-              <div className="cutout-wax-floating-seal">
-                <span>M</span>
+              <div className="hamper-ribbon-tag">
+                <span className="ribbon-tag-sparkle">✦</span>
+                <span>Signature Trunk</span>
               </div>
             </div>
           </div>
@@ -620,20 +626,14 @@ export const HomePage: React.FC = () => {
                     {prod.name}
                   </h3>
 
-                  {/* Clean Star Rating */}
+                  {/* Clean Fractional Star Rating */}
                   <div className="new-arrival-rating-row">
-                    <div className="stars-row">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={12}
-                          fill={i < Math.floor(prod.rating) ? '#ffd166' : '#eae3ec'}
-                          stroke="none"
-                        />
-                      ))}
-                    </div>
-                    <span className="rating-score-val">{prod.rating.toFixed(1)}</span>
-                    <span className="rating-reviews-tag">({prod.reviewCount})</span>
+                    <RatingStars
+                      rating={prod.rating}
+                      size={13}
+                      showScore={true}
+                      reviewCount={prod.reviewCount}
+                    />
                   </div>
 
                   <div className="new-arrival-bottom-row">
@@ -701,19 +701,16 @@ export const HomePage: React.FC = () => {
                   {hamper.badge && (
                     <span className="treat-badge-chip">{hamper.badge}</span>
                   )}
-                  <div className="cutout-pedestal-aura" />
                   <img
                     src={hamper.image}
                     alt={hamper.name}
                     className="cutout-floating-img"
                   />
 
-                  {/* Wax Seal Floating Monogram */}
-                  <div
-                    className="hamper-wax-badge"
-                    style={{ backgroundColor: hamper.ribbonColor || '#f5899e' }}
-                  >
-                    <span>M</span>
+                  {/* Boutique Silk Ribbon Accent */}
+                  <div className="hamper-ribbon-tag">
+                    <span className="ribbon-tag-sparkle">✦</span>
+                    <span>Atelier Handcrafted</span>
                   </div>
 
                   <div className="treat-hover-overlay">
@@ -896,18 +893,12 @@ export const HomePage: React.FC = () => {
 
                   {/* Clean Transparent Cake Rating Row */}
                   <div className="cake-clean-rating-row">
-                    <div className="cake-stars-flex">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={13}
-                          fill={i < Math.floor(cupcake.rating) ? '#ffd166' : '#eae3ec'}
-                          stroke="none"
-                        />
-                      ))}
-                    </div>
-                    <span className="cake-rating-score">{cupcake.rating.toFixed(1)}</span>
-                    <span className="cake-reviews-count">({cupcake.reviewCount} reviews)</span>
+                    <RatingStars
+                      rating={cupcake.rating}
+                      size={13}
+                      showScore={true}
+                      reviewCount={cupcake.reviewCount}
+                    />
                   </div>
 
                   <span className="cupcake-price">
@@ -968,7 +959,6 @@ export const HomePage: React.FC = () => {
                     navigateTo('/product/' + prod.slug);
                   }}
                 >
-                  <div className="cutout-pedestal-aura" />
                   <img
                     src={prod.image}
                     alt={prod.name}
@@ -1087,34 +1077,46 @@ export const HomePage: React.FC = () => {
       {/* 11. POLKA DOT NEWSLETTER BANNER CARD */}
       <section className="newsletter-banner-card-section">
         <div className="site-container">
-          <div className="polka-dot-banner-card" data-tilt>
-            <div className="banner-cupcake decor-left cutout-product-stage">
-              <img src="/images/craft_gift_box.jpg" alt="Pink Gift Box" className="cutout-floating-img" />
+          <div className="polka-dot-banner-card">
+            {/* Left Cupcake matching Screenshot 4 */}
+            <div className="banner-cupcake-wrapper banner-cupcake-left">
+              <img
+                src="/images/cupcake1.png"
+                alt="Strawberry Swirl Cupcake"
+                className="banner-cupcake-img"
+              />
             </div>
 
             <div className="banner-center-content">
-              <span className="badge-subscribe-now">JOIN THE ATELIER CIRCLE</span>
-              <h2 className="banner-headline">Receive Exclusive Gift Previews</h2>
+              <div className="badge-subscribe-now-wrap">
+                <span className="badge-subscribe-now">SUBSCRIBE NOW</span>
+              </div>
+              <h2 className="banner-headline">To Receive Exclusive Offers!</h2>
               <p className="banner-subtext">
-                Subscribers receive complimentary calligraphy upgrades, seasonal collection access, and 15% off their first keepsake trunk.
+                Be the first to know about new collections and exclusive offers.
               </p>
 
               <form onSubmit={handleNewsletterSubmit} className="banner-form-row">
                 <input
                   type="email"
-                  placeholder="Enter your email address"
+                  placeholder="Your email here"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   required
                 />
                 <button type="submit" className="btn-banner-subscribe">
-                  SUBSCRIBE
+                  SUBSCRIBE <span className="arrow-sym">→</span>
                 </button>
               </form>
             </div>
 
-            <div className="banner-cupcake decor-right cutout-product-stage">
-              <img src="/images/hero_gift_boxes.jpg" alt="Gift Hamper" className="cutout-floating-img" />
+            {/* Right Cupcake matching Screenshot 4 */}
+            <div className="banner-cupcake-wrapper banner-cupcake-right">
+              <img
+                src="/images/cupcake2.png"
+                alt="Blue Sprinkle Cupcake"
+                className="banner-cupcake-img"
+              />
             </div>
           </div>
         </div>
@@ -1169,8 +1171,8 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Quick View Modal */}
-      {quickViewProduct && (
+      {/* Quick View Modal rendered into document.body */}
+      {quickViewProduct && createPortal(
         <div className="modal-backdrop" onClick={() => setQuickViewProduct(null)}>
           <div
             className="quick-view-card"
@@ -1185,7 +1187,6 @@ export const HomePage: React.FC = () => {
             </button>
             <div className="quick-view-grid">
               <div className="qv-img-holder cutout-product-stage">
-                <div className="cutout-pedestal-aura" />
                 <img
                   src={quickViewProduct.image}
                   alt={quickViewProduct.name}
@@ -1196,8 +1197,12 @@ export const HomePage: React.FC = () => {
                 <span className="qv-cat">{quickViewProduct.category}</span>
                 <h2>{quickViewProduct.name}</h2>
                 <div className="qv-rating">
-                  {'★'.repeat(Math.round(quickViewProduct.rating))}
-                  <span>({quickViewProduct.reviewCount} reviews)</span>
+                  <RatingStars
+                    rating={quickViewProduct.rating}
+                    size={14}
+                    showScore={true}
+                    reviewCount={quickViewProduct.reviewCount}
+                  />
                 </div>
                 <div className="qv-price">${quickViewProduct.price.toFixed(2)}</div>
                 <p className="qv-desc">{quickViewProduct.shortDescription}</p>
@@ -1239,7 +1244,8 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

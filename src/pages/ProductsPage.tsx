@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { Heart, ShoppingCart, Eye, Star, SlidersHorizontal } from 'lucide-react';
+import { Heart, ShoppingCart, Eye, SlidersHorizontal } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useCart } from '../context/CartContext';
@@ -10,6 +11,7 @@ import {
   GIFTS_PRODUCTS,
   KEEPSAKES_PRODUCTS
 } from '../data/products';
+import { RatingStars } from '../components/RatingStars';
 import type { Product } from '../types';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -41,7 +43,19 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
   const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('featured');
   const [showFilters, setShowFilters] = useState(false);
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (quickViewProduct) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [quickViewProduct]);
 
   const getBaseProducts = (): Product[] => {
     if (effectiveCategory === 'Cakes') return [...CAKES_PRODUCTS];
@@ -101,18 +115,9 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
   }, [activeCategory, sortBy, effectiveCategory]);
 
   const renderStars = (rating: number) => {
-    const full = Math.floor(rating);
     return (
       <div className="product-stars-row">
-        {Array.from({ length: 5 }, (_, i) => (
-          <Star
-            key={i}
-            size={13}
-            fill={i < full ? '#ffd166' : '#eae3ec'}
-            stroke="none"
-          />
-        ))}
-        <span className="review-count-small">({rating.toFixed(1)})</span>
+        <RatingStars rating={rating} size={13} showScore={true} />
       </div>
     );
   };
@@ -155,7 +160,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
       <section className="products-hero-banner">
         <div className="site-container">
           <span className="section-eyebrow products-page-title">{headerInfo.eyebrow}</span>
-          <h1 className="section-title-cormorant products-page-title">
+          <h1 className="section-title-serif products-page-title title-crunch">
             {headerInfo.title}
           </h1>
           <p className="section-lead-subtitle products-page-title">
@@ -265,11 +270,10 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
                         className="hover-action-btn"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setActiveProduct(product);
-                          navigateTo('/product/' + product.slug);
+                          setQuickViewProduct(product);
                         }}
-                        title="View Details"
-                        aria-label="View Details"
+                        title="Quick View"
+                        aria-label="Quick View"
                       >
                         <Eye size={16} color="#fff" />
                       </button>
@@ -291,7 +295,7 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
                   <div className="product-card-info">
                     <span className="product-card-category">{product.category}</span>
                     <h3
-                      className="product-card-name"
+                      className="product-card-name title-crunch"
                       onClick={() => {
                         setActiveProduct(product);
                         navigateTo('/product/' + product.slug);
@@ -323,6 +327,83 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
           </div>
         </div>
       </section>
+
+      {/* Quick View Modal rendered into document.body */}
+      {quickViewProduct && createPortal(
+        <div className="modal-backdrop" onClick={() => setQuickViewProduct(null)}>
+          <div
+            className="quick-view-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="close-quick-view-btn"
+              onClick={() => setQuickViewProduct(null)}
+            >
+              ✕
+            </button>
+            <div className="quick-view-grid">
+              <div className="qv-img-holder cutout-product-stage">
+                <img
+                  src={quickViewProduct.image}
+                  alt={quickViewProduct.name}
+                  className="cutout-floating-img"
+                />
+              </div>
+              <div className="quick-view-details">
+                <span className="qv-cat">{quickViewProduct.category}</span>
+                <h2 className="title-crunch">{quickViewProduct.name}</h2>
+                <div className="qv-rating">
+                  <RatingStars
+                    rating={quickViewProduct.rating}
+                    size={14}
+                    showScore={true}
+                    reviewCount={quickViewProduct.reviewCount}
+                  />
+                </div>
+                <div className="qv-price">${quickViewProduct.price.toFixed(2)}</div>
+                <p className="qv-desc">{quickViewProduct.shortDescription}</p>
+
+                {quickViewProduct.boxContents && (
+                  <div className="qv-contents-box">
+                    <strong>Included in Hamper:</strong>
+                    <ul>
+                      {quickViewProduct.boxContents.map((c, i) => (
+                        <li key={i}>✓ {c}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="qv-actions">
+                  <button
+                    type="button"
+                    className="btn-qv-add"
+                    onClick={() => {
+                      addToCart(quickViewProduct, 1);
+                      setQuickViewProduct(null);
+                    }}
+                  >
+                    Add to Cart
+                  </button>
+                  <button
+                    type="button"
+                    className="btn-qv-view-more"
+                    onClick={() => {
+                      setActiveProduct(quickViewProduct);
+                      navigateTo('/product/' + quickViewProduct.slug);
+                      setQuickViewProduct(null);
+                    }}
+                  >
+                    Full Details →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 };

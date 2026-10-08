@@ -14,6 +14,7 @@ import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { TermsPage } from './pages/TermsPage';
 import { MyAccountPage } from './pages/MyAccountPage';
 import { initLenis, destroyLenis } from './utils/lenis';
+import { ScrollToTop } from './components/ScrollToTop';
 
 const AppContent: React.FC = () => {
   const { toast, showPreloader } = useCart();
@@ -53,6 +54,11 @@ const AppContent: React.FC = () => {
           filter: 'blur(0px)',
           duration: 1.2,
           ease: 'power3.out',
+          onComplete: () => {
+            if (siteWrapperRef.current) {
+              gsap.set(siteWrapperRef.current, { clearProps: 'transform,scale,filter' });
+            }
+          },
         }
       );
     }
@@ -113,6 +119,7 @@ const AppContent: React.FC = () => {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <CartProvider>
         <AppContent />
       </CartProvider>

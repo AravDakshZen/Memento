@@ -1,13 +1,50 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Heart,
   Repeat,
   ZoomIn,
-  ClipboardList
+  ZoomOut,
+  RotateCcw,
+  ClipboardList,
+  Mail,
+  X
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS, REVIEWS_DATA } from '../data/products';
+import { RatingStars } from '../components/RatingStars';
 import type { Review } from '../types';
+
+// High-precision Official Brand SVG Icons
+const FacebookIcon: React.FC = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+  </svg>
+);
+
+const TwitterIcon: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+const LinkedinIcon: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+  </svg>
+);
+
+const PinterestIcon: React.FC = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345-.09.375-.291 1.199-.33 1.365-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.546.535 6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z" />
+  </svg>
+);
+
+const WhatsAppIcon: React.FC = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z" />
+  </svg>
+);
 
 export const ProductOverviewPage: React.FC = () => {
   const {
@@ -24,6 +61,28 @@ export const ProductOverviewPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'description' | 'requirements' | 'reviews'>('description');
   const [selectedImage, setSelectedImage] = useState(activeProduct.image);
   const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  const [lightboxScale, setLightboxScale] = useState(1);
+  const [isHoverZooming, setIsHoverZooming] = useState(false);
+  const [zoomCoords, setZoomCoords] = useState({ x: 50, y: 50 });
+
+  useEffect(() => {
+    if (isZoomModalOpen) {
+      document.body.style.overflow = 'hidden';
+      setLightboxScale(1);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isZoomModalOpen]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setZoomCoords({ x, y });
+  };
 
   // Sync state when activeProduct changes so each product displays its own unique details
   const [reviewsList, setReviewsList] = useState<Review[]>(
@@ -72,7 +131,36 @@ export const ProductOverviewPage: React.FC = () => {
   };
 
   const handleShare = (platform: string) => {
-    showToast(`Shared to ${platform}! Link copied.`);
+    const shareUrl = window.location.href;
+    const text = `Check out ${activeProduct.name} at Memento!`;
+    const encodedUrl = encodeURIComponent(shareUrl);
+    const encodedText = encodeURIComponent(text);
+
+    let destination = '';
+    if (platform === 'Facebook') {
+      destination = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+    } else if (platform === 'Twitter') {
+      destination = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`;
+    } else if (platform === 'LinkedIn') {
+      destination = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+    } else if (platform === 'Pinterest') {
+      destination = `https://pinterest.com/pin/create/button/?url=${encodedUrl}&media=${encodeURIComponent(selectedImage || activeProduct.image)}&description=${encodedText}`;
+    } else if (platform === 'WhatsApp') {
+      destination = `https://api.whatsapp.com/send?text=${encodedText}%20${encodedUrl}`;
+    } else if (platform === 'Email') {
+      destination = `mailto:?subject=${encodedText}&body=${encodedUrl}`;
+    }
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl).catch(() => {});
+    }
+
+    if (platform === 'Email') {
+      window.location.href = destination;
+    } else if (destination) {
+      window.open(destination, '_blank', 'noopener,noreferrer,width=650,height=550');
+    }
+    showToast(`🎀 Shared "${activeProduct.name}" to ${platform}! Link copied.`);
   };
 
   // Filter out current active product from related list
@@ -102,17 +190,36 @@ export const ProductOverviewPage: React.FC = () => {
         <div className="site-container showcase-grid">
           {/* Left: Product Image Gallery */}
           <div className="product-gallery-column">
-            <div className="main-image-viewport cutout-product-stage" data-tilt>
-              <div className="cutout-pedestal-aura" />
+            <div
+              className={`main-image-viewport ${isHoverZooming ? 'hover-zoomed' : ''}`}
+              onMouseEnter={() => setIsHoverZooming(true)}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={() => setIsHoverZooming(false)}
+              onClick={() => setIsZoomModalOpen(true)}
+              title="Click to view full screen"
+            >
               <img
                 src={selectedImage || activeProduct.image}
                 alt={activeProduct.name}
                 className="main-product-img cutout-floating-img"
+                style={{
+                  transform: isHoverZooming ? 'scale(2.3)' : 'scale(1)',
+                  transformOrigin: `${zoomCoords.x}% ${zoomCoords.y}%`,
+                  transition: isHoverZooming ? 'transform 0.08s ease-out' : 'transform 0.35s ease-out',
+                  cursor: 'zoom-in'
+                }}
               />
+              <span className={`hover-zoom-pill ${isHoverZooming ? 'active' : ''}`}>
+                <ZoomIn size={12} />
+                {isHoverZooming ? 'Zoom Active' : 'Hover to Zoom'}
+              </span>
               <button
                 type="button"
                 className="zoom-magnifier-btn"
-                onClick={() => setIsZoomModalOpen(true)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsZoomModalOpen(true);
+                }}
                 title="Zoom in on product"
                 aria-label="Zoom image"
               >
@@ -153,15 +260,14 @@ export const ProductOverviewPage: React.FC = () => {
               )}
             </div>
 
-            {/* Star Rating */}
+            {/* Star Rating with Fractional Decimals */}
             <div className="product-ratings-summary">
-              <div className="gold-stars">
-                {'★'.repeat(Math.round(activeProduct.rating))}
-                {'☆'.repeat(5 - Math.round(activeProduct.rating))}
-              </div>
-              <span className="reviews-count-text">
-                ({reviewsList.length} verified reviews for this product)
-              </span>
+              <RatingStars
+                rating={activeProduct.rating}
+                size={17}
+                showScore={true}
+                reviewCount={reviewsList.length}
+              />
             </div>
 
             {/* Short Description */}
@@ -250,11 +356,60 @@ export const ProductOverviewPage: React.FC = () => {
             <div className="product-share-row">
               <span className="share-label">Share:</span>
               <div className="share-icons-wrap">
-                <button type="button" onClick={() => handleShare('Facebook')} title="Facebook">f</button>
-                <button type="button" onClick={() => handleShare('Twitter')} title="Twitter">🕊</button>
-                <button type="button" onClick={() => handleShare('LinkedIn')} title="LinkedIn">in</button>
-                <button type="button" onClick={() => handleShare('Pinterest')} title="Pinterest">📌</button>
-                <button type="button" onClick={() => handleShare('Email')} title="Email">✉</button>
+                <button
+                  type="button"
+                  className="share-btn-brand brand-facebook"
+                  onClick={() => handleShare('Facebook')}
+                  title="Share on Facebook"
+                  aria-label="Share on Facebook"
+                >
+                  <FacebookIcon />
+                </button>
+                <button
+                  type="button"
+                  className="share-btn-brand brand-twitter"
+                  onClick={() => handleShare('Twitter')}
+                  title="Share on X"
+                  aria-label="Share on X"
+                >
+                  <TwitterIcon />
+                </button>
+                <button
+                  type="button"
+                  className="share-btn-brand brand-linkedin"
+                  onClick={() => handleShare('LinkedIn')}
+                  title="Share on LinkedIn"
+                  aria-label="Share on LinkedIn"
+                >
+                  <LinkedinIcon />
+                </button>
+                <button
+                  type="button"
+                  className="share-btn-brand brand-pinterest"
+                  onClick={() => handleShare('Pinterest')}
+                  title="Share on Pinterest"
+                  aria-label="Share on Pinterest"
+                >
+                  <PinterestIcon />
+                </button>
+                <button
+                  type="button"
+                  className="share-btn-brand brand-whatsapp"
+                  onClick={() => handleShare('WhatsApp')}
+                  title="Share on WhatsApp"
+                  aria-label="Share on WhatsApp"
+                >
+                  <WhatsAppIcon />
+                </button>
+                <button
+                  type="button"
+                  className="share-btn-brand brand-email"
+                  onClick={() => handleShare('Email')}
+                  title="Share via Email"
+                  aria-label="Share via Email"
+                >
+                  <Mail size={14} />
+                </button>
               </div>
             </div>
 
@@ -521,8 +676,7 @@ export const ProductOverviewPage: React.FC = () => {
                 </h3>
 
                 <div className="related-stars">
-                  {'★'.repeat(Math.round(prod.rating))}
-                  {'☆'.repeat(5 - Math.round(prod.rating))}
+                  <RatingStars rating={prod.rating} size={13} showScore={true} />
                 </div>
 
                 <button
@@ -538,25 +692,72 @@ export const ProductOverviewPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Full-Screen Zoom Modal */}
-      {isZoomModalOpen && (
-        <div className="modal-backdrop" onClick={() => setIsZoomModalOpen(false)}>
-          <div className="zoom-modal-content" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="zoom-close-btn"
-              onClick={() => setIsZoomModalOpen(false)}
-            >
-              ✕
-            </button>
-            <img
-              src={selectedImage || activeProduct.image}
-              alt={activeProduct.name}
-              className="zoomed-high-res-img"
-            />
-            <p className="zoom-caption">{activeProduct.name} — Luxury Boutique View</p>
+      {/* Full-Screen Interactive Lightbox Zoom Modal rendered to body */}
+      {isZoomModalOpen && createPortal(
+        <div className="modal-backdrop zoom-lightbox-backdrop" onClick={() => setIsZoomModalOpen(false)}>
+          <div className="zoom-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="zoom-toolbar">
+              <div className="zoom-info-badge">
+                <span className="zoom-product-title">{activeProduct.name}</span>
+                <span className="zoom-level-indicator">({Math.round(lightboxScale * 100)}%)</span>
+              </div>
+              <div className="zoom-actions-group">
+                <button
+                  type="button"
+                  className="zoom-tool-btn"
+                  onClick={() => setLightboxScale((s) => Math.max(0.6, Number((s - 0.25).toFixed(2))))}
+                  title="Zoom Out"
+                  aria-label="Zoom Out"
+                >
+                  <ZoomOut size={16} />
+                </button>
+                <button
+                  type="button"
+                  className="zoom-tool-btn"
+                  onClick={() => setLightboxScale(1)}
+                  title="Reset Zoom"
+                  aria-label="Reset Zoom"
+                >
+                  <RotateCcw size={15} />
+                </button>
+                <button
+                  type="button"
+                  className="zoom-tool-btn"
+                  onClick={() => setLightboxScale((s) => Math.min(3.5, Number((s + 0.25).toFixed(2))))}
+                  title="Zoom In"
+                  aria-label="Zoom In"
+                >
+                  <ZoomIn size={16} />
+                </button>
+                <button
+                  type="button"
+                  className="zoom-close-btn"
+                  onClick={() => setIsZoomModalOpen(false)}
+                  title="Close Viewer"
+                  aria-label="Close"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            <div className="zoom-image-stage">
+              <img
+                src={selectedImage || activeProduct.image}
+                alt={activeProduct.name}
+                className="zoomed-high-res-img"
+                style={{
+                  transform: `scale(${lightboxScale})`,
+                  cursor: lightboxScale > 1 ? 'grab' : 'zoom-in',
+                  transition: 'transform 0.18s ease-out'
+                }}
+                onClick={() => setLightboxScale((s) => (s >= 2 ? 1 : Number((s + 0.5).toFixed(2))))}
+              />
+            </div>
+            <p className="zoom-caption">Click image or use controls to inspect handcrafted details</p>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
