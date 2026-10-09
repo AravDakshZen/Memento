@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Heart,
@@ -8,7 +8,9 @@ import {
   RotateCcw,
   ClipboardList,
   Mail,
-  X
+  X,
+  Share2,
+  ShoppingBag
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS, REVIEWS_DATA } from '../data/products';
@@ -64,6 +66,23 @@ export const ProductOverviewPage: React.FC = () => {
   const [lightboxScale, setLightboxScale] = useState(1);
   const [isHoverZooming, setIsHoverZooming] = useState(false);
   const [zoomCoords, setZoomCoords] = useState({ x: 50, y: 50 });
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const buyBoxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (buyBoxRef.current) {
+        const rect = buyBoxRef.current.getBoundingClientRect();
+        // Show sticky bar when buy box scrolls past top viewport
+        setShowStickyBar(rect.bottom < 0);
+      } else {
+        setShowStickyBar(window.scrollY > 450);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     if (isZoomModalOpen) {
@@ -128,6 +147,27 @@ export const ProductOverviewPage: React.FC = () => {
     setReviewerName('');
     setReviewerEmail('');
     showToast(`🎀 Thank you! Your review for "${activeProduct.name}" has been published.`);
+  };
+
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Memento — ${activeProduct.name}`,
+          text: activeProduct.shortDescription || `Explore ${activeProduct.name} at Memento Gifting Atelier`,
+          url: window.location.href,
+        });
+        showToast('🎀 Link shared successfully!');
+        return;
+      } catch {
+        // User cancelled or share failed, fallback
+      }
+    }
+    // Fallback: Copy link
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('🎀 Product link copied to clipboard!');
+    }
   };
 
   const handleShare = (platform: string) => {
@@ -283,7 +323,7 @@ export const ProductOverviewPage: React.FC = () => {
                   {activeProduct.boxContents.map((item, idx) => (
                     <li key={idx}>✓ {item}</li>
                   ))}
-                  <li>✓ Double-faced French Satin Ribbon & Wax Seal</li>
+                  <li>✓ Double-faced French Satin Ribbon & Keepsake Packaging</li>
                   <li>✓ Complimentary Handwritten Calligraphy Note</li>
                 </ul>
               </div>
@@ -292,7 +332,7 @@ export const ProductOverviewPage: React.FC = () => {
             <div className="dotted-separator-line"></div>
 
             {/* Quantity Selector & Add to Cart */}
-            <div className="product-purchase-row">
+            <div className="product-purchase-row" ref={buyBoxRef}>
               <div className="quantity-counter-wrap">
                 <span className="quantity-label">Quantity:</span>
                 <div className="counter-box">
@@ -356,6 +396,16 @@ export const ProductOverviewPage: React.FC = () => {
             <div className="product-share-row">
               <span className="share-label">Share:</span>
               <div className="share-icons-wrap">
+                <button
+                  type="button"
+                  className="share-btn-brand brand-native-share"
+                  onClick={handleNativeShare}
+                  title="Share with friends"
+                  aria-label="Share with friends"
+                >
+                  <Share2 size={14} />
+                  <span className="share-btn-text">Share</span>
+                </button>
                 <button
                   type="button"
                   className="share-btn-brand brand-facebook"
@@ -691,6 +741,55 @@ export const ProductOverviewPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Sticky Mobile Add-to-Cart Floating Bar (Visible when scrolling on mobile) */}
+      <div className={`mobile-sticky-buy-bar ${showStickyBar ? 'visible' : ''}`}>
+        <div className="sticky-bar-inner">
+          <div className="sticky-bar-product-info">
+            <img
+              src={selectedImage || activeProduct.image}
+              alt={activeProduct.name}
+              className="sticky-bar-thumb"
+            />
+            <div className="sticky-bar-meta">
+              <h4 className="sticky-bar-title">{activeProduct.name}</h4>
+              <span className="sticky-bar-price">${activeProduct.price}</span>
+            </div>
+          </div>
+
+          <div className="sticky-bar-actions">
+            <div className="sticky-qty-stepper">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                aria-label="Decrease quantity"
+              >
+                -
+              </button>
+              <span>{quantity}</span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                aria-label="Increase quantity"
+              >
+                +
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="sticky-btn-add"
+              onClick={() => {
+                addToCart(activeProduct, quantity);
+                showToast(`🎀 Added ${quantity}x "${activeProduct.name}" to cart!`);
+              }}
+            >
+              <ShoppingBag size={16} />
+              <span>Add to Bag</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Full-Screen Interactive Lightbox Zoom Modal rendered to body */}
       {isZoomModalOpen && createPortal(

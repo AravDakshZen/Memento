@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   ChevronDown,
+  ChevronRight,
   X,
   Search,
   ShoppingBag,
   User,
   Phone,
-  Mail
+  Mail,
+  Sparkles,
+  Gift,
+  Cake,
+  Package
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { ALL_PRODUCTS } from '../data/products';
@@ -42,6 +47,18 @@ export const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchWrapRef = useRef<HTMLDivElement>(null);
+
+  // Prevent background scroll when mobile drawer is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   // Vertical rolling ticker for search keywords
   useEffect(() => {
@@ -449,19 +466,162 @@ export const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile Slide-down Menu */}
+        {/* Luxury Mobile Slide-out Drawer with Frosted Overlay */}
         {isMobileMenuOpen && (
-          <div className="mobile-nav-drawer">
-            <button type="button" className="mobile-nav-link" onClick={() => { navigateTo('/'); setIsMobileMenuOpen(false); }}>HOME</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { scrollToSection('new-arrivals-section'); setIsMobileMenuOpen(false); }}>NEW ARRIVALS</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { navigateTo('/products'); setIsMobileMenuOpen(false); }}>ALL PRODUCTS</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { scrollToSection('curated-hampers-section'); setIsMobileMenuOpen(false); }}>GIFT ITEMS</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { scrollToSection('sweet-favors-section'); setIsMobileMenuOpen(false); }}>CAKES</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { scrollToSection('party-items-section'); setIsMobileMenuOpen(false); }}>PARTY ITEMS</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { navigateTo('/my-account'); setIsMobileMenuOpen(false); }}>MY ACCOUNT</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { navigateTo('/cart'); setIsMobileMenuOpen(false); }}>CART ({cartCount})</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { navigateTo('/privacy-policy'); setIsMobileMenuOpen(false); }}>PRIVACY POLICY</button>
-            <button type="button" className="mobile-nav-link" onClick={() => { navigateTo('/terms-and-conditions'); setIsMobileMenuOpen(false); }}>TERMS & CONDITIONS</button>
+          <div className="mobile-nav-backdrop" onClick={() => setIsMobileMenuOpen(false)}>
+            <div
+              className="mobile-nav-drawer"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-label="Mobile Navigation Menu"
+            >
+              {/* Drawer Top Header */}
+              <div className="mobile-drawer-header">
+                <div className="mobile-drawer-brand" onClick={() => { navigateTo('/'); setIsMobileMenuOpen(false); }}>
+                  <span className="brand-logo-text">Memento<span className="logo-dot">.</span></span>
+                  <span className="drawer-sub-eyebrow">Haute Gifting Atelier</span>
+                </div>
+                <button
+                  type="button"
+                  className="mobile-drawer-close-btn"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Drawer Content */}
+              <div className="mobile-drawer-body">
+                {/* Primary Navigation Sections */}
+                <div className="mobile-nav-group">
+                  <span className="mobile-group-title">COLLECTIONS</span>
+                  <div className="mobile-group-links">
+                    <button
+                      type="button"
+                      className="mobile-nav-tile"
+                      onClick={() => { navigateTo('/'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span className="tile-title">Home</span>
+                      <span className="tile-meta">Frontispiece</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-tile"
+                      onClick={() => { navigateTo('/products'); setIsMobileMenuOpen(false); }}
+                    >
+                      <Package size={16} className="tile-icon" />
+                      <span className="tile-title">All Products</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-tile"
+                      onClick={() => { navigateTo('/gifts'); setIsMobileMenuOpen(false); }}
+                    >
+                      <Gift size={16} className="tile-icon" />
+                      <span className="tile-title">Curated Gift Hampers</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-tile"
+                      onClick={() => { navigateTo('/cakes'); setIsMobileMenuOpen(false); }}
+                    >
+                      <Cake size={16} className="tile-icon" />
+                      <span className="tile-title">Cakes & Sweet Muffins</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-tile"
+                      onClick={() => { navigateTo('/keepsakes'); setIsMobileMenuOpen(false); }}
+                    >
+                      <Sparkles size={16} className="tile-icon" />
+                      <span className="tile-title">Keepsakes & Party Items</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mobile-nav-group">
+                  <span className="mobile-group-title">ATELIER EXPERIENCES</span>
+                  <div className="mobile-group-links">
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { scrollToSection('new-arrivals-section'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span>New Arrivals Showcase</span>
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { scrollToSection('atelier-experience'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span>Interactive 3D Unboxing</span>
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { scrollToSection('blog-section'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span>The Gifting Gazette (Blog)</span>
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="mobile-nav-group">
+                  <span className="mobile-group-title">CUSTOMER SERVICES</span>
+                  <div className="mobile-group-links">
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { navigateTo('/my-account'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span><User size={15} /> My Account & Saved Items</span>
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { navigateTo('/cart'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span><ShoppingBag size={15} /> Shopping Bag ({cartCount})</span>
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { navigateTo('/privacy-policy'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span>Privacy Policy</span>
+                      <ChevronRight size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="mobile-nav-row-item"
+                      onClick={() => { navigateTo('/terms-and-conditions'); setIsMobileMenuOpen(false); }}
+                    >
+                      <span>Terms & Conditions</span>
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Direct Contact Buttons */}
+                <div className="mobile-drawer-contact-box">
+                  <span className="contact-box-title">Direct Atelier Concierge:</span>
+                  <div className="contact-quick-btns">
+                    <a href="tel:+15551234567" className="quick-btn">
+                      <Phone size={14} /> Call Concierge
+                    </a>
+                    <a href="mailto:info@memento.com" className="quick-btn">
+                      <Mail size={14} /> Email Us
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </nav>

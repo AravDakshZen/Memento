@@ -30,7 +30,6 @@ export interface CartItem {
   product: Product;
   quantity: number;
   giftNote?: string;
-  waxSealColor?: string;
   monogram?: string;
 }
 
@@ -51,21 +50,5 @@ export interface BlogPost {
   readTime: string;
   image: string;
   excerpt: string;
-}
-
-export interface AiGiftRecommendation {
-  id: string;
-  recipient: string;
-  occasion: string;
-  aesthetic: string;
-  title: string;
-  subtitle: string;
-  price: number;
-  image: string;
-  itemsIncluded: string[];
-  ribbonColor: string;
-  waxSealColor: string;
-  cardMessage: string;
-  monogram: string;
 }
 

@@ -38,7 +38,7 @@ export const PrivacyPolicyPage: React.FC = () => {
             <p>At Memento, we collect information to provide you with the best luxury gifting experience possible. This includes:</p>
             <ul>
               <li><strong>Personal Information:</strong> Name, email address, phone number, shipping and billing addresses provided during checkout or account creation.</li>
-              <li><strong>Order Details:</strong> Gift messages, calligraphy text, monogram initials, wax seal preferences, and product selections.</li>
+              <li><strong>Order Details:</strong> Gift messages, calligraphy text, monogram initials, packaging preferences, and product selections.</li>
               <li><strong>Payment Information:</strong> Credit card details are processed securely through our PCI-compliant payment partners. We do not store full card numbers.</li>
               <li><strong>Usage Data:</strong> Browsing patterns, page visits, and interaction data to improve our website experience.</li>
               <li><strong>Device Information:</strong> Browser type, operating system, IP address, and device identifiers.</li>

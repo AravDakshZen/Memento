@@ -23,6 +23,7 @@ export const CartPage: React.FC = () => {
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [checkoutComplete, setCheckoutComplete] = useState(false);
+  const [orderNumber, setOrderNumber] = useState('');
 
   useEffect(() => {
     if (window.location.pathname.includes('checkout') && cart.length > 0) {
@@ -60,6 +61,7 @@ export const CartPage: React.FC = () => {
 
   const handleCompleteOrder = (e: React.FormEvent) => {
     e.preventDefault();
+    setOrderNumber(String(Math.floor(100000 + Math.random() * 900000)));
     setCheckoutComplete(true);
     confetti({
       particleCount: 120,
@@ -135,7 +137,8 @@ export const CartPage: React.FC = () => {
             <div className="cart-layout-container">
               {/* Left/Main: Products Table */}
               <div className="cart-table-wrapper">
-                <table className="memento-cart-table">
+                {/* Desktop Table View */}
+                <table className="memento-cart-table desktop-only-table">
                   <thead>
                     <tr>
                       <th className="th-product">PRODUCT</th>
@@ -242,6 +245,85 @@ export const CartPage: React.FC = () => {
                   </tbody>
                 </table>
 
+                {/* Mobile Touch Cards View (Shown on screens <= 768px) */}
+                <div className="mobile-cart-items-cards">
+                  {cart.map((item) => (
+                    <div key={item.product.id} className="mobile-cart-card">
+                      <div className="mobile-cart-card-top">
+                        <img
+                          src={item.product.image}
+                          alt={item.product.name}
+                          className="mobile-cart-thumb"
+                          onClick={() => {
+                            setActiveProduct(item.product);
+                            setActivePage('product');
+                          }}
+                        />
+                        <div className="mobile-cart-card-details">
+                          <span className="mobile-cart-cat">{item.product.category}</span>
+                          <h4
+                            className="mobile-cart-name"
+                            onClick={() => {
+                              setActiveProduct(item.product);
+                              setActivePage('product');
+                            }}
+                          >
+                            {item.product.name}
+                          </h4>
+                          <span className="mobile-cart-price">
+                            ${item.product.price.toFixed(2)}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          className="mobile-cart-remove"
+                          onClick={() => removeFromCart(item.product.id)}
+                          aria-label="Remove item"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+
+                      <div className="mobile-cart-card-bottom">
+                        <div className="mobile-cart-stepper">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateQuantity(
+                                item.product.id,
+                                item.quantity - 1
+                              )
+                            }
+                            aria-label="Decrease quantity"
+                          >
+                            -
+                          </button>
+                          <span className="mobile-stepper-val">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              updateQuantity(
+                                item.product.id,
+                                item.quantity + 1
+                              )
+                            }
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <div className="mobile-card-total-box">
+                          <span className="total-label">Subtotal:</span>
+                          <strong className="total-val">
+                            ${(item.product.price * item.quantity).toFixed(2)}
+                          </strong>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
                 {/* Table Bottom Action Row */}
                 <div className="cart-bottom-actions-row">
                   <button
@@ -249,7 +331,7 @@ export const CartPage: React.FC = () => {
                     className="link-continue-shopping"
                     onClick={() => setActivePage('home')}
                   >
-                    Continue Shopping
+                    ← Continue Shopping
                   </button>
 
                   <button
@@ -370,7 +452,7 @@ export const CartPage: React.FC = () => {
                   <Sparkles size={40} className="sparkle-anim" />
                 </div>
                 <h2>Order Confirmed! 🎀</h2>
-                <p className="order-number">Order #MEMENTO-{Math.floor(100000 + Math.random() * 900000)}</p>
+                <p className="order-number">Order #MEMENTO-{orderNumber || '789234'}</p>
                 <p className="order-message">
                   Thank you for shopping at Memento & Memento! Your sweet packages are being delicately wrapped with satin ribbons and pink tissue.
                 </p>

@@ -6,6 +6,7 @@ import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { Preloader } from './components/Preloader';
 import { CartDrawer } from './components/CartDrawer';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { HomePage } from './pages/HomePage';
 import { ProductOverviewPage } from './pages/ProductOverviewPage';
 import { ProductsPage } from './pages/ProductsPage';
@@ -104,9 +105,12 @@ const AppContent: React.FC = () => {
 
         {/* Slide-out Mini Cart Drawer */}
         <CartDrawer />
+
+        {/* Mobile Floating Bottom App Dock (Visible on Mobile Viewport) */}
+        <MobileBottomNav />
       </div>
 
-      {/* 3. Boutique Toast Notification */}
+      {/* Boutique Toast Notification */}
       {toast && (
         <div className="boutique-toast" role="status" aria-live="polite">
           {toast}

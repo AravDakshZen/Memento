@@ -1,4 +1,4 @@
-import type { Product, Review, BlogPost, AiGiftRecommendation } from '../types';
+import type { Product, Review, BlogPost } from '../types';
 
 export const MAIN_PRODUCT: Product = {
   id: 'prod-encouragement',
@@ -17,21 +17,20 @@ export const MAIN_PRODUCT: Product = {
   category: 'Curated Gift Hampers',
   categories: ['Curated Gift Hampers', 'Personalised Keepsakes', 'Luxury Stationery'],
   sku: 'MEM-350-TRUNK',
-  tags: ['Bespoke', 'Satin Ribbon', 'Handcrafted', 'Wax Sealed', 'Keepsake'],
+  tags: ['Bespoke', 'Satin Ribbon', 'Handcrafted', 'Keepsake'],
   shortDescription:
-    'Hand-assembled in our atelier with double-faced French satin ribbon, custom wax seal engraving, and handwritten calligraphy. Includes artisanal scented candle, leatherette card keeper, and sweet treats.',
+    'Hand-assembled in our atelier with double-faced French satin ribbon and handwritten calligraphy. Includes artisanal scented candle, leatherette card keeper, and sweet treats.',
   fullDescription:
-    'Our signature Memento Keepsake Gift Trunk is designed for unforgettable milestones. Each hamper is delicately arranged inside a handcrafted archival box lined with rose-tinted tissue, finished with custom metallic hot-stamped monogramming and an embossed wax seal stamp.',
+    'Our signature Memento Keepsake Gift Trunk is designed for unforgettable milestones. Each hamper is delicately arranged inside a handcrafted archival box lined with rose-tinted tissue, finished with custom metallic hot-stamped monogramming and French satin ribbons.',
   features: [
     'Hand-poured coconut soy candle in blush ceramic vessel',
     'Custom engraved wooden card keeper book with satin ties',
     'Artisanal raspberry & bourbon vanilla confection treats',
-    'Complimentary handwritten calligraphy message card with royal wax seal',
+    'Complimentary handwritten calligraphy message card',
     'Handcrafted keepsake gift trunk box with magnetic closure'
   ],
   requirements: [
     'Custom Calligraphy: Enter recipient message (max 35 words) during checkout for hand-lettered ink card.',
-    'Wax Seal Preference: Select antique gold, blush rose, or burgundy seal during order confirmation.',
     'Lead Time: Requires 24-48 hours for hand calligraphy curing before express courier dispatch.',
     'Preservation Care: Store botanical candle and archival trunk in a cool, dry area away from direct sunlight.'
   ],
@@ -47,7 +46,7 @@ export const MAIN_PRODUCT: Product = {
     'Hand-poured Rose & Peony Botanical Candle',
     'Handcrafted Wooden Keepsake Card Book',
     'Artisanal Sweet Confectionery Gift Box',
-    'Bespoke Wax-Sealed Greeting Card'
+    'Bespoke Handwritten Greeting Card'
   ],
   reviews: [
     {
@@ -57,7 +56,7 @@ export const MAIN_PRODUCT: Product = {
       rating: 5,
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       comment:
-        'The unboxing was breathtaking! The double-faced velvet ribbon, golden wax seal, and delicate calligraphy card made my sister burst into happy tears. Absolutely unforgettable.'
+        'The unboxing was breathtaking! The double-faced velvet ribbon and delicate calligraphy card made my sister burst into happy tears. Absolutely unforgettable.'
     },
     {
       id: 'rev-enc-2',
@@ -1149,7 +1148,7 @@ export const INSTA_POSTS = [
     id: 1,
     img: 'https://images.unsplash.com/photo-1513885535751-8b9238bd345a?auto=format&fit=crop&w=600&q=80',
     likes: 1420,
-    caption: 'Bespoke silk bows and golden wax seals for a romantic milestone 🎀✨'
+    caption: 'Bespoke silk bows and luxury calligraphy for a romantic milestone 🎀✨'
   },
   {
     id: 2,
@@ -1176,5 +1175,3 @@ export const INSTA_POSTS = [
     caption: 'Golden foil accents and delicate French confections 🌸'
   }
 ];
-
-export const AI_GIFT_PRESETS: AiGiftRecommendation[] = [];

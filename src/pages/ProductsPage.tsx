@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
-import { Heart, ShoppingCart, Eye, SlidersHorizontal } from 'lucide-react';
+import { Heart, ShoppingCart, Eye, SlidersHorizontal, X, Check } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useCart } from '../context/CartContext';
@@ -195,13 +195,14 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
             <button
               type="button"
               className="filter-toggle-btn"
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={() => setShowFilters(true)}
+              aria-label="Filter and Sort"
             >
-              <SlidersHorizontal size={15} /> Sort & Filter
+              <SlidersHorizontal size={15} /> Filter & Sort
             </button>
 
             <select
-              className="sort-select"
+              className="sort-select desktop-sort-select"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               aria-label="Sort products"
@@ -218,6 +219,98 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({ forcedCategory }) =>
         <div className="site-container">
           <p className="results-count">{filteredProducts.length} items available in boutique</p>
         </div>
+
+        {/* Mobile Filter & Sort Slide-up Sheet */}
+        {showFilters && (
+          <div className="modal-backdrop mobile-filter-backdrop" onClick={() => setShowFilters(false)}>
+            <div
+              className="mobile-filter-sheet"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-label="Filter & Sort"
+            >
+              <div className="filter-sheet-header">
+                <div className="sheet-drag-handle" />
+                <div className="sheet-header-title-row">
+                  <h3>Filter & Sort</h3>
+                  <button
+                    type="button"
+                    className="sheet-close-btn"
+                    onClick={() => setShowFilters(false)}
+                    aria-label="Close filters"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="filter-sheet-body">
+                {/* 1. Sort Options */}
+                <div className="filter-sheet-section">
+                  <h4 className="sheet-section-heading">Sort By</h4>
+                  <div className="sheet-radio-group">
+                    {[
+                      { id: 'featured', label: 'Featured Collection' },
+                      { id: 'price-low', label: 'Price: Low to High' },
+                      { id: 'price-high', label: 'Price: High to Low' },
+                      { id: 'rating', label: 'Customer Rating' },
+                      { id: 'newest', label: 'Newest Arrivals' }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        className={`sheet-radio-btn ${sortBy === opt.id ? 'active' : ''}`}
+                        onClick={() => setSortBy(opt.id)}
+                      >
+                        <span>{opt.label}</span>
+                        {sortBy === opt.id && <Check size={16} className="check-icon" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Category Selection (if not forced category) */}
+                {!effectiveCategory && (
+                  <div className="filter-sheet-section">
+                    <h4 className="sheet-section-heading">Categories</h4>
+                    <div className="sheet-category-grid">
+                      {CATEGORIES.map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          className={`sheet-cat-chip ${activeCategory === cat ? 'active' : ''}`}
+                          onClick={() => setActiveCategory(cat)}
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="filter-sheet-footer">
+                <button
+                  type="button"
+                  className="btn-sheet-reset"
+                  onClick={() => {
+                    setSortBy('featured');
+                    setActiveCategory('All');
+                  }}
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  className="btn-sheet-apply"
+                  onClick={() => setShowFilters(false)}
+                >
+                  Apply ({filteredProducts.length} items)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Products Grid */}

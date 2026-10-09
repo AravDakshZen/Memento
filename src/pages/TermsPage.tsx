@@ -51,7 +51,7 @@ export const TermsPage: React.FC = () => {
             <ul>
               <li>Prices are displayed in USD and are inclusive of applicable taxes unless stated otherwise.</li>
               <li>We accept Visa, MasterCard, American Express, PayPal, and Apple Pay.</li>
-              <li>Custom calligraphy, monogram engraving, and wax seal orders require 24–48 hours of additional lead time.</li>
+              <li>Custom calligraphy and monogram engraving orders require 24–48 hours of additional lead time.</li>
               <li>Order confirmation emails will be sent within 30 minutes of successful payment processing.</li>
               <li>We reserve the right to cancel orders if pricing errors are detected or if items are out of stock.</li>
             </ul>
@@ -78,7 +78,7 @@ export const TermsPage: React.FC = () => {
             <ul>
               <li><strong>Non-Perishable Items:</strong> May be returned within 14 days of delivery in original, unopened condition for a full refund.</li>
               <li><strong>Perishable Items (Cakes, Confections):</strong> Due to their nature, perishable items are non-returnable. Contact us within 24 hours of delivery if the item arrives damaged.</li>
-              <li><strong>Personalized/Custom Items:</strong> Items with custom calligraphy, monograms, or wax seals are non-returnable unless defective.</li>
+              <li><strong>Personalized/Custom Items:</strong> Items with custom calligraphy or monograms are non-returnable unless defective.</li>
               <li>Return shipping costs are the responsibility of the customer unless the return is due to our error.</li>
               <li>Refunds will be processed to the original payment method within 5–10 business days of receiving the return.</li>
             </ul>

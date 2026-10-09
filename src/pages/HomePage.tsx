@@ -59,14 +59,14 @@ export const HomePage: React.FC = () => {
   const testimonials = [
     {
       quote:
-        '“The unboxing was breathtaking. Opening the blush trunk, smelling the rose-peony candle, and seeing our custom wax seal monogram was pure luxury. My sister cried happy tears!”',
+        '“The unboxing was breathtaking. Opening the blush trunk, smelling the rose-peony candle, and seeing our personalized calligraphy card was pure luxury. My sister cried happy tears!”',
       author: 'GENEVIEVE LAURENT',
       role: 'Verified Milestone Buyer',
       img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
     },
     {
       quote:
-        '“The Memento atelier curated 25 bespoke executive hampers for our year-end corporate retreat. Every client called to compliment the French satin ribbons and calligraphy cards.”',
+        '“The Memento boutique curated 25 bespoke executive hampers for our year-end corporate retreat. Every client called to compliment the French satin ribbons and calligraphy cards.”',
       author: 'JULIAN MONTGOMERY',
       role: 'Managing Partner, Atelier Lux',
       img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80'
@@ -238,7 +238,7 @@ export const HomePage: React.FC = () => {
         }
       );
       gsap.fromTo(
-        '.wax-stamp-station-card',
+        '.calligraphy-concierge-card',
         { opacity: 0, x: 50 },
         {
           opacity: 1,
@@ -443,7 +443,7 @@ export const HomePage: React.FC = () => {
             </div>
 
             <p className="hero-subtext hero-stagger-text">
-              Hand-wrapped with double-faced French satin ribbons, custom wax seals, and personalized calligraphy notes. Elevating celebrations into unforgettable heirlooms.
+              Hand-wrapped with double-faced French satin ribbons and personalized calligraphy notes. Elevating celebrations into unforgettable heirlooms.
             </p>
 
             <div className="hero-cta-wrapper hero-stagger-text">
@@ -462,8 +462,6 @@ export const HomePage: React.FC = () => {
               >
                 <Package size={17} /> Explore Curated Hampers
               </button>
-
-              {/* Instant AI Concierge Launch Button */}
             </div>
           </div>
 
@@ -487,7 +485,7 @@ export const HomePage: React.FC = () => {
           </div>
           <div className="perk-item">
             <span className="perk-bullet">✦</span>
-            <span>COMPLIMENTARY WAX-SEALED CARD</span>
+            <span>COMPLIMENTARY CALLIGRAPHY CARD</span>
           </div>
           <div className="perk-item">
             <span className="perk-bullet">✦</span>
@@ -514,14 +512,10 @@ export const HomePage: React.FC = () => {
           <div className="story-center-col">
             <div className="diamond-gift-box-wrap cutout-product-stage" data-tilt data-cursor="VIEW">
               <img
-                src="/images/craft_gift_box.jpg"
-                alt="Handcrafted Celestial gift box"
+                src="/images/Polka-Dot Pink Gift Box with Bow.png"
+                alt="Polka-Dot Pink Keepsake Gift Box"
                 className="cutout-floating-img"
               />
-              <div className="hamper-ribbon-tag">
-                <span className="ribbon-tag-sparkle">✦</span>
-                <span>Signature Trunk</span>
-              </div>
             </div>
           </div>
 
@@ -707,12 +701,6 @@ export const HomePage: React.FC = () => {
                     className="cutout-floating-img"
                   />
 
-                  {/* Boutique Silk Ribbon Accent */}
-                  <div className="hamper-ribbon-tag">
-                    <span className="ribbon-tag-sparkle">✦</span>
-                    <span>Atelier Handcrafted</span>
-                  </div>
-
                   <div className="treat-hover-overlay">
                     <button
                       type="button"
@@ -784,7 +772,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4. INTERACTIVE 3D UNBOXING & WAX STAMPING EXPERIENCE */}
+      {/* 4. INTERACTIVE 3D UNBOXING EXPERIENCE */}
       <UnboxExperience />
 
       {/* 5. INFINITE MARQUEE TICKER (WITH SCROLLTRIGGER ACCELERATION) */}
@@ -793,7 +781,7 @@ export const HomePage: React.FC = () => {
           <div className="marquee-content">
             <span>FRENCH SATIN RIBBONS</span>
             <span className="marquee-sparkle">✦</span>
-            <span>CUSTOM WAX SEALS</span>
+            <span>LUXURY GIFT BOXES</span>
             <span className="marquee-sparkle">✦</span>
             <span>HANDWRITTEN CALLIGRAPHY</span>
             <span className="marquee-sparkle">✦</span>
@@ -805,7 +793,7 @@ export const HomePage: React.FC = () => {
           <div className="marquee-content" aria-hidden="true">
             <span>FRENCH SATIN RIBBONS</span>
             <span className="marquee-sparkle">✦</span>
-            <span>CUSTOM WAX SEALS</span>
+            <span>LUXURY GIFT BOXES</span>
             <span className="marquee-sparkle">✦</span>
             <span>HANDWRITTEN CALLIGRAPHY</span>
             <span className="marquee-sparkle">✦</span>
@@ -1018,7 +1006,7 @@ export const HomePage: React.FC = () => {
                   alt={testimonials[activeTestimonialIdx].author}
                 />
               </div>
-              <span className="watermelon-sticker" title="Wax seal love">💌</span>
+              <span className="watermelon-sticker" title="Gifting love">💌</span>
               <span className="sparkle-sticker">✨</span>
             </div>
 

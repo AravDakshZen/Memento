@@ -30,7 +30,7 @@ const TwitterIcon = () => (
 );
 
 export const Footer: React.FC = () => {
-  const { setActivePage, showToast } = useCart();
+  const { navigateTo, showToast } = useCart();
   const [showTopBtn, setShowTopBtn] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
 
@@ -61,7 +61,7 @@ export const Footer: React.FC = () => {
           <div className="footer-col col-brand">
             <h3 className="footer-brand-title">Memento</h3>
             <p className="footer-description">
-              Welcome to Memento, an haute gifting atelier dedicated to curated keepsake hampers, French satin ribbons, and bespoke wax-sealed memories.
+              Welcome to Memento, an haute gifting atelier dedicated to curated keepsake hampers, French satin ribbons, and bespoke celebratory memories.
             </p>
             <p className="store-hours-note">
               Our gifting concierges are always at your service to craft bespoke moments.
@@ -89,28 +89,28 @@ export const Footer: React.FC = () => {
             <h4 className="footer-col-title">THE SHOP</h4>
             <ul className="footer-nav-list">
               <li>
-                <button type="button" onClick={() => setActivePage('home')}>
-                  Shop
+                <button type="button" onClick={() => navigateTo('/products')}>
+                  All Products
                 </button>
               </li>
               <li>
-                <button type="button" onClick={() => setActivePage('product')}>
-                  New Arrivals
+                <button type="button" onClick={() => navigateTo('/gifts')}>
+                  Curated Gift Hampers
                 </button>
               </li>
               <li>
-                <a href="#privacy" onClick={(e) => { e.preventDefault(); alert('Privacy Policy'); }}>
-                  Privacy Policy
-                </a>
+                <button type="button" onClick={() => navigateTo('/cakes')}>
+                  Artisanal Cakes & Muffins
+                </button>
               </li>
               <li>
-                <a href="#shipping" onClick={(e) => { e.preventDefault(); alert('Free standard shipping over $300'); }}>
-                  Shipping & Returns
-                </a>
+                <button type="button" onClick={() => navigateTo('/keepsakes')}>
+                  Keepsakes & Party Items
+                </button>
               </li>
               <li>
-                <button type="button" onClick={() => setActivePage('cart')}>
-                  My Cart
+                <button type="button" onClick={() => navigateTo('/cart')}>
+                  Shopping Bag
                 </button>
               </li>
             </ul>
@@ -118,32 +118,34 @@ export const Footer: React.FC = () => {
 
           {/* Column 3: More Info / Services */}
           <div className="footer-col">
-            <h4 className="footer-col-title">MORE INFO</h4>
+            <h4 className="footer-col-title">CUSTOMER CARE</h4>
             <ul className="footer-nav-list">
               <li>
-                <a href="#blog" onClick={(e) => { e.preventDefault(); document.getElementById('blog-section')?.scrollIntoView({ behavior: 'smooth' }); }}>
-                  Blog
-                </a>
+                <button type="button" onClick={() => navigateTo('/my-account')}>
+                  My Account
+                </button>
               </li>
               <li>
-                <a href="#about" onClick={(e) => { e.preventDefault(); alert('About Memento & Memento Sweet Boutique'); }}>
-                  About Us
-                </a>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const el = document.getElementById('blog-section');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    else navigateTo('/');
+                  }}
+                >
+                  The Gifting Gazette (Blog)
+                </button>
               </li>
               <li>
-                <a href="#faq" onClick={(e) => { e.preventDefault(); alert('Frequently Asked Questions'); }}>
-                  FAQ
-                </a>
+                <button type="button" onClick={() => navigateTo('/privacy-policy')}>
+                  Privacy Policy
+                </button>
               </li>
               <li>
-                <a href="#size-charts" onClick={(e) => { e.preventDefault(); alert('Size Charts & Specs'); }}>
-                  Size Charts
-                </a>
-              </li>
-              <li>
-                <a href="#terms" onClick={(e) => { e.preventDefault(); alert('Terms & Conditions'); }}>
+                <button type="button" onClick={() => navigateTo('/terms-and-conditions')}>
                   Terms & Conditions
-                </a>
+                </button>
               </li>
             </ul>
           </div>
